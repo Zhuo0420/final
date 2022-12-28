@@ -5,6 +5,7 @@
 #include <cmath>
 #define H 5
 #define W 5
+//#define DEBUG
 
 using namespace std;
 int path[12]={0};
@@ -25,6 +26,8 @@ struct Node {
     struct Node* pRight;
     struct Node* pBack;
 };
+/*
+
 void checkerboard(int A[2][H][W], int M[2][2], int O[2][2]) {
     int i, j;
     for (int c = 0; c < 2; c++) {
@@ -38,6 +41,7 @@ void checkerboard(int A[2][H][W], int M[2][2], int O[2][2]) {
     }
     
 }
+*/
 void getPosition(int A[2][H][W], int M[2][2], int O[2][2]) {       //取得自己與對方位置座標 (棋盤的x, y)
     int i, j;
     int c = 0;
@@ -54,8 +58,8 @@ void getPosition(int A[2][H][W], int M[2][2], int O[2][2]) {       //取得自�
     for (i = 0; i < H; i++) {
         for (j = 0; j < W; j++) {
             if (A[0][i][j] == other) {
-                O[c][0] = i;
-                O[c][1] = j;
+                O[c][0] = j;
+                O[c][1] = i;
                 c++;
             }
         }
@@ -92,7 +96,7 @@ void fTo1(struct Node* p) {
         c += 2;
     }
 }
-bool judge(int x, int y, int A[2][H][W], struct Node* p) {
+bool judge(int x, int y, int A[2][H][W], struct Node* p) {      //x, y 為欲到達的點，判斷此點是否與tmp的x, y一樣，有一樣的錶此點被走過，不可在次走到此點
     struct Node* tmp;
     tmp = p;
     while (tmp) {
@@ -107,148 +111,6 @@ bool judge(int x, int y, int A[2][H][W], struct Node* p) {
         }
     }
 }
-/*void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增加p點後的分支，p位置為X,Y，tmp新節點為上下左右某位置()，第m步
-    if (m < 6) {
-        if (m == 5) {
-            if (A[0][X - 1][Y] == other && X>0) {
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X - 1;
-                tmp.y = Y;
-                tmp.level = 2;
-                tmp.f = 1;
-                tmp.cango = 1;
-                p->pUp = &tmp;
-                p->pDown = 0;
-                p->pLeft = 0;
-                p->pRight = 0;
-                F = 1;
-                fTo1(&tmp);
-                return;
-            }
-            else if (A[0][X + 1][Y] == other && X<4) {
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X + 1;
-                tmp.y = Y;
-                tmp.level = 2;
-                tmp.f = 1;
-                tmp.cango = 1;
-                p->pUp = 0;
-                p->pDown = &tmp;
-                p->pLeft = 0;
-                p->pRight = 0;
-                F = 1;
-                fTo1(&tmp);
-                return;
-            }
-            else if (A[0][X][Y - 1] == other && Y>0) {
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X;
-                tmp.y = Y - 1;
-                tmp.level = 2;
-                tmp.f = 1;
-                tmp.cango = 1;
-                p->pUp = 0;
-                p->pDown = 0;
-                p->pLeft = &tmp;
-                p->pRight = 0;
-                F = 1;
-                fTo1(&tmp);
-                return;
-            }
-            else if (A[0][X][Y + 1] == other && Y<4) {
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X;
-                tmp.y = Y + 1;
-                tmp.level = 2;
-                tmp.f = 1;
-                tmp.cango = 1;
-                p->pUp = 0;
-                p->pDown = 0;
-                p->pLeft = 0;
-                p->pRight = &tmp;
-                F = 1;
-                fTo1(&tmp);
-                return;
-            }
-        }
-        if (A[0][X - 1][Y] == 0 && X>0) {
-            if (!judge(X - 1, Y, A, p)) {
-                p->cango = 1;
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X - 1;
-                tmp.y = Y;
-                tmp.f = 0;
-                tmp.level = 1;
-                tmp.cango = 1;
-                p->pUp = &tmp;
-                addNode(&tmp, A, X - 1, Y, m + 1);
-            }
-        }
-        else
-            p->pUp = 0;
-        if (A[0][X + 1][Y] == 0 && X<4) {
-            if (!judge(X + 1, Y, A, p)) {
-                p->cango = 1;
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X + 1;
-                tmp.y = Y;
-                tmp.f = 0;
-                tmp.level = 1;
-                tmp.cango = 1;
-                p->pDown = &tmp;
-                addNode(&tmp, A, X + 1, Y, m + 1);
-            }
-        }
-        else
-            p->pDown = 0;
-        if (A[0][X][Y - 1] == 0 && Y>1) {
-            if (!judge(X, Y - 1, A, p)) {
-                p->cango = 1;
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X;
-                tmp.y = Y - 1;
-                tmp.f = 0;
-                tmp.level = 1;
-                tmp.cango = 1;
-                p->pLeft = &tmp;
-                addNode(&tmp, A, X, Y - 1, m + 1);
-            }
-        }
-        else
-            p->pLeft = 0;
-        if (A[0][X][Y + 1] == 0 && Y<4) {
-            if (!judge(X, Y + 1, A, p)) {
-                p->cango = 1;
-                struct Node tmp = { 0 };
-                tmp.pBack = p;
-                tmp.m = m;
-                tmp.x = X;
-                tmp.y = Y + 1;
-                tmp.f = 0;
-                tmp.level = 1;
-                tmp.cango = 1;
-                p->pRight = &tmp;
-                addNode(&tmp, A, X, Y + 1, m + 1);
-            }
-        }
-        else
-            p->pRight = 0;
-    }
-}*/
 void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增加p點後的分支，p位置為X,Y，tmp新節點為上下左右某位置(x,y為棋盤的x, y)，第m步
     if (m < 6) {
         if (m == 5) {
@@ -267,7 +129,6 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pRight = 0;
                 F = 1;
                 fTo1(&tmp);
-                return;
             }
             else if (A[0][Y + 1][X] == other && Y<4) {
                 struct Node tmp = { 0 };
@@ -284,7 +145,6 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pRight = 0;
                 F = 1;
                 fTo1(&tmp);
-                return;
             }
             else if (A[0][Y][X - 1] == other && X>0) {
                 struct Node tmp = { 0 };
@@ -301,7 +161,6 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pRight = 0;
                 F = 1;
                 fTo1(&tmp);
-                return;
             }
             else if (A[0][Y][X + 1] == other && X<4) {
                 struct Node tmp = { 0 };
@@ -318,7 +177,6 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pRight = &tmp;
                 F = 1;
                 fTo1(&tmp);
-                return;
             }
         }
         if (A[0][Y - 1][X] == 0 && Y>0) {
@@ -335,6 +193,7 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pUp = &tmp;
                 addNode(&tmp, A, X, Y - 1, m + 1);
             }
+            else p->pUp = 0;
         }
         else
             p->pUp = 0;
@@ -352,10 +211,11 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pDown = &tmp;
                 addNode(&tmp, A, X, Y + 1, m + 1);
             }
+            else p->pDown = 0;
         }
         else
             p->pDown = 0;
-        if (A[0][Y][X - 1] == 0 && X>1) {
+        if (A[0][Y][X - 1] == 0 && X>0) {
             if (!judge(X - 1, Y, A, p)) {
                 p->cango = 1;
                 struct Node tmp = { 0 };
@@ -369,6 +229,7 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pLeft = &tmp;
                 addNode(&tmp, A, X - 1, Y, m + 1);
             }
+            else p->pLeft = 0;
         }
         else
             p->pLeft = 0;
@@ -386,6 +247,7 @@ void addNode(struct Node* p, int A[2][H][W], int X, int Y, int m) {       //增�
                 p->pRight = &tmp;
                 addNode(&tmp, A, X + 1, Y, m + 1);
             }
+            else p->pRight = 0;
         }
         else
             p->pRight = 0;
@@ -494,8 +356,9 @@ int main(int argc, char** argv)
             k++;
         }
     }
-    int M[2][2];        //我的棋子的位置
-    int O[2][2];        //對方棋子的位置
+    
+    int M[2][2];        //我的棋子的位置 (棋盤的x,y)
+    int O[2][2];        //對方棋子的位置 (棋盤的x,y)
     getPosition(A, M, O);
     int firstChess = check(A, M, O);            //第0或第1顆棋子
     int chess[2] = { M[firstChess][0],M[firstChess][1] };       //棋盤的x,y 
@@ -504,7 +367,7 @@ int main(int argc, char** argv)
     C1.y = M[firstChess][1];
     C1.level = 1;
     C1.cango = 0;
-    checkerboard(A, M, O);
+    //checkerboard(A, M, O);
     if (A[0][M[firstChess][0] - 1][M[firstChess][1]] == 0 || A[0][M[firstChess][0] + 1][M[firstChess][1]] == 0 || A[0][M[firstChess][0]][M[firstChess][1] - 1] == 0 || A[0][M[firstChess][0]][M[firstChess][1] + 1] == 0) { 
         addNode(&C1, A, M[firstChess][0], M[firstChess][1], 1);
     }
@@ -521,37 +384,73 @@ int main(int argc, char** argv)
         }
     }
     else {
-        if (A[0][chess[1] + 1][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] + 1] == 0) {
+        if (A[0][chess[1] + 1][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] + 1] == 0 && chess[1]<4 && chess[0]<4) {
             out << chess[0] << " " << chess[1] << " ";
             out << chess[0] + 1 << " " << chess[1] << " ";
             out << chess[0] + 1 << " " << chess[1] + 1 << " ";
         }
-        else if (A[0][chess[1] - 1][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0) {
+        else if (A[0][chess[1] - 1][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0 && chess[1] > 0 && chess[0] > 0) {
             out << chess[0] << " " << chess[1] << " ";
             out << chess[0] - 1 << " " << chess[1] << " ";
             out << chess[0] - 1 << " " << chess[1] - 1 << " ";
         }
-        else if (A[0][chess[1] + 1][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0) {
-            out << chess[0] << " " << chess[1] << " ";
-            out << chess[0] - 1 << " " << chess[1] << " ";
-            out << chess[0] + 1 << " " << chess[1] - 1 << " ";
+        else if (chess[1] < 4 && chess[0] > 0) {
+            if(A[0][chess[1] + 1][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0){
+                out << chess[0] << " " << chess[1] << " ";
+                out << chess[0] - 1 << " " << chess[1] << " ";
+                out << chess[0] - 1 << " " << chess[1] + 1 << " ";
+            }
         }
-        else if (A[0][chess[1] - 1][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0) {
-            out << chess[0] << " " << chess[1] << " ";
-            out << chess[0] - 1 << " " << chess[1] << " ";
-            out << chess[0] - 1 << " " << chess[1] - 1 << " ";
+        else if (chess[1] > 0 && chess[0] < 4) {
+            if (A[0][chess[1] - 1][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] - 1] == 0) {
+                out << chess[0] << " " << chess[1] << " ";
+                out << chess[0] - 1 << " " << chess[1] << " ";
+                out << chess[0] + 1 << " " << chess[1] - 1 << " ";
+            }
+
         }
-        else if (A[0][chess[1]][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] + 2] == 0) {
-            out << chess[0] << " " << chess[1] << " ";
-            out << chess[0] + 1 << " " << chess[1] << " ";
-            out << chess[0] + 2 << " " << chess[1] << " ";
+        else if (chess[0] < 3) {
+            if (A[0][chess[1]][chess[0] + 1] == 0 && A[0][chess[1]][chess[0] + 2] == 0) {
+                out << chess[0] << " " << chess[1] << " ";
+                out << chess[0] + 1 << " " << chess[1] << " ";
+                out << chess[0] + 2 << " " << chess[1] << " ";
+            }  
         }
-        else if (A[0][chess[1]][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 2] == 0) {
-            out << chess[0] << " " << chess[1] << " ";
-            out << chess[0] - 1 << " " << chess[1] << " ";
-            out << chess[0] - 2 << " " << chess[1] << " ";
+        else if (chess[0] > 1) {
+            if (A[0][chess[1]][chess[0] - 1] == 0 && A[0][chess[1]][chess[0] - 2] == 0) {
+                out << chess[0] << " " << chess[1] << " ";
+                out << chess[0] - 1 << " " << chess[1] << " ";
+                out << chess[0] - 2 << " " << chess[1] << " ";
+            }
         }
     }
-    
+#ifdef DEBUG
+    cout << me;
+    cout << other;
+    cout << endl;
+    for (i = 0; i < 2; i++) {
+        cout << chess[i] << " ";
+    }
+    cout << endl;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            cout << M[i][j];
+        }
+    }
+    cout << endl;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            cout << O[i][j];
+        }
+    }
+    cout << endl;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 5; j++) {
+            cout << A[0][i][j];
+        }
+        cout << endl;
+    }
+#endif // DEBUG
+    out.close();
     return 0;
 }
